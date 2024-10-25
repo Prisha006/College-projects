@@ -94,4 +94,4 @@ for orf in all_orfs:
 max_orf_no = max(len_orfs.keys())
 max_orf = len_orfs[max_orf_no]
 print(f"The longest Open Reading Frame is: {max_orf}")
-print(f"It's corresponding protein: {all_proteins[max_orf]}")
+print(f"Its corresponding protein: {all_proteins[max_orf]}")
