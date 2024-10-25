@@ -1,0 +1,88 @@
+#Mainly just changed list comprehensions to for loops
+
+START_CODON = "ATG"
+STOP_CODON = ["TAA", "TAG", "TGA"]
+GENCODE_TABLE = {
+            'ATA':'I', 'ATC':'I', 'ATT':'I', 'ATG':'M',
+            'ACA':'T', 'ACC':'T', 'ACG':'T', 'ACT':'T',
+            'AAC':'N', 'AAT':'N', 'AAA':'K', 'AAG':'K',
+            'AGC':'S', 'AGT':'S', 'AGA':'R', 'AGG':'R',
+            'CTA':'L', 'CTC':'L', 'CTG':'L', 'CTT':'L',
+            'CCA':'P', 'CCC':'P', 'CCG':'P', 'CCT':'P',
+            'CAC':'H', 'CAT':'H', 'CAA':'Q', 'CAG':'Q',
+            'CGA':'R', 'CGC':'R', 'CGG':'R', 'CGT':'R',
+            'GTA':'V', 'GTC':'V', 'GTG':'V', 'GTT':'V',
+            'GCA':'A', 'GCC':'A', 'GCG':'A', 'GCT':'A',
+            'GAC':'D', 'GAT':'D', 'GAA':'E', 'GAG':'E',
+            'GGA':'G', 'GGC':'G', 'GGG':'G', 'GGT':'G',
+            'TCA':'S', 'TCC':'S', 'TCG':'S', 'TCT':'S',
+            'TTC':'F', 'TTT':'F', 'TTA':'L', 'TTG':'L',
+            'TAC':'Y', 'TAT':'Y', 'TAA':'_', 'TAG':'_',
+            'TGC':'C', 'TGT':'C', 'TGA':'_', 'TGG':'W',
+} 
+
+dna = "atgcgatggtcacgtaggtagtg".upper()
+
+def start_from(dna, init_pos = 0):
+    seq = ""
+    for pos in range(init_pos, len(dna)):
+        seq += dna[pos]
+    return seq
+
+def gen_frame(seq):
+    frames = []
+    for i in range(3):
+        frames.append(start_from(seq, i))
+    return frames
+
+def search_codon(seq):
+    position = 0
+    orf_seq = ""
+
+    while position < len(seq)-2:
+        current_codon = seq[position:position+3]
+        if current_codon == START_CODON:
+            orf_seq += current_codon
+        if START_CODON in orf_seq:
+            if current_codon in STOP_CODON:
+                orf_seq += current_codon
+                break
+            elif current_codon in GENCODE_TABLE and current_codon != START_CODON:
+                orf_seq += current_codon
+        position += 3
+
+    return orf_seq
+
+def to_protein(seq):
+    protein = ""
+    position = 0
+    while position < len(seq):
+        current_codon = seq[position:position+3]
+        protein += GENCODE_TABLE[current_codon]
+        position += 3
+
+    return protein
+
+frames = gen_frame(dna)
+print(frames)
+
+all_orfs = []
+for frame in frames:
+  sequence = search_codon(frame)
+  all_orfs.append(sequence)
+
+all_proteins = {}
+for orf in all_orfs:
+   amino_acid = to_protein(orf)
+   all_proteins[orf] = amino_acid
+
+print(all_orfs)
+len_orfs = {}
+for orf in all_orfs:
+  orf_length = len(orf)
+  len_orfs[orf_length] = orf
+
+max_orf_no = max(len_orfs.keys())
+max_orf = len_orfs[max_orf_no]
+print(max_orf)
+print(all_proteins[max_orf])
