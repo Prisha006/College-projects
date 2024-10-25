@@ -1,5 +1,3 @@
-#Mainly just changed list comprehensions to for loops
-
 START_CODON = "ATG"
 STOP_CODON = ["TAA", "TAG", "TGA"]
 GENCODE_TABLE = {
@@ -21,21 +19,25 @@ GENCODE_TABLE = {
             'TGC':'C', 'TGT':'C', 'TGA':'_', 'TGG':'W',
 } 
 
-dna = "atgcgatggtcacgtaggtagtg".upper()
+dna = input("Enter DNA String: ").upper()
+# Use atgcgatggtcacgtaggtagtg for testing
 
 def start_from(dna, init_pos = 0):
+    """Start reading sequence from an input position till the end"""
     seq = ""
     for pos in range(init_pos, len(dna)):
         seq += dna[pos]
     return seq
 
 def gen_frame(seq):
+    """Generate 3 frames that read from positions 0,1 and 2"""
     frames = []
     for i in range(3):
         frames.append(start_from(seq, i))
     return frames
 
 def search_codon(seq):
+    """Start reading codons from start codon to end codon"""
     position = 0
     orf_seq = ""
 
@@ -43,6 +45,7 @@ def search_codon(seq):
         current_codon = seq[position:position+3]
         if current_codon == START_CODON:
             orf_seq += current_codon
+
         if START_CODON in orf_seq:
             if current_codon in STOP_CODON:
                 orf_seq += current_codon
@@ -54,6 +57,7 @@ def search_codon(seq):
     return orf_seq
 
 def to_protein(seq):
+    """Generate protein by converting each codon to amino acid"""
     protein = ""
     position = 0
     while position < len(seq):
@@ -63,20 +67,25 @@ def to_protein(seq):
 
     return protein
 
+#Generate frames
 frames = gen_frame(dna)
-print(frames)
+print(f"The frames are: {frames}")
 
+#Generate all open reading frames
 all_orfs = []
 for frame in frames:
   sequence = search_codon(frame)
   all_orfs.append(sequence)
+print(f"All Open Reading Frames are: {all_orfs}")
 
+#Generate all proteins
 all_proteins = {}
 for orf in all_orfs:
    amino_acid = to_protein(orf)
    all_proteins[orf] = amino_acid
+print(f"All the proteins are: {all_proteins}")
 
-print(all_orfs)
+#Find ORF with maximum length
 len_orfs = {}
 for orf in all_orfs:
   orf_length = len(orf)
@@ -84,5 +93,5 @@ for orf in all_orfs:
 
 max_orf_no = max(len_orfs.keys())
 max_orf = len_orfs[max_orf_no]
-print(max_orf)
-print(all_proteins[max_orf])
+print(f"The longest Open Reading Frame is: {max_orf}")
+print(f"It's corresponding protein: {all_proteins[max_orf]}")
